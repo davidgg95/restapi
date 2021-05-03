@@ -231,8 +231,8 @@ class ProductoRoutes {
         await db.conectarBD()
         .then( async ()=> {
             const query = await Productos.aggregate([
-                {
-                    $group: {
+            {
+                $group: {
                     _id:"$_tienda", Total_productos:{$sum: "$_cantidad"}
                 }
             }

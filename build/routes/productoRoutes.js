@@ -44,7 +44,6 @@ class ProductoRoutes {
             yield database_1.db.desconectarBD();
         });
         this.getTiendas = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const { nombre } = req.params;
             yield database_1.db.conectarBD()
                 .then(() => __awaiter(this, void 0, void 0, function* () {
                 const query = yield schemas_1.Tiendas.aggregate([
@@ -199,6 +198,23 @@ class ProductoRoutes {
             });
             database_1.db.desconectarBD();
         });
+        this.getProdu = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            yield database_1.db.conectarBD()
+                .then(() => __awaiter(this, void 0, void 0, function* () {
+                const query = yield schemas_1.Productos.aggregate([
+                    {
+                        $group: {
+                            _id: "$_tienda", Total_productos: { $sum: "$_cantidad" }
+                        }
+                    }
+                ]);
+                res.json(query);
+            }))
+                .catch((mensaje) => {
+                res.send(mensaje);
+            });
+            yield database_1.db.desconectarBD();
+        });
         this._router = express_1.Router();
     }
     get router() {
@@ -215,6 +231,7 @@ class ProductoRoutes {
         this._router.post('/actualizaTienda/:nombre', this.actualizaTienda);
         this._router.get('/borrarProducto/:nombre', this.deleteProducto);
         this._router.get('/borrarTienda/:nombre', this.deleteTienda);
+        this._router.get('/produ', this.getProdu);
     }
 }
 const obj = new ProductoRoutes();

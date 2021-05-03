@@ -45,7 +45,6 @@ class ProductoRoutes {
     }
 
     private getTiendas = async (req:Request, res: Response) => {
-        const { nombre } = req.params
         await db.conectarBD()
         .then( async ()=> {
             const query = await Tiendas.aggregate([
@@ -228,6 +227,24 @@ class ProductoRoutes {
         db.desconectarBD()
     }
 
+    private getProdu = async (req:Request, res: Response) => {
+        await db.conectarBD()
+        .then( async ()=> {
+            const query = await Productos.aggregate([
+                {
+                    $group: {
+                    _id:"$_tienda", Total_productos:{$sum: "$_cantidad"}
+                }
+            }
+            ])
+            res.json(query)
+        })
+        .catch((mensaje) => {
+            res.send(mensaje)
+        })
+        await db.desconectarBD()
+    }
+
 
     misRutas(){
         this._router.get('/', this.getTiendas)
@@ -240,6 +257,7 @@ class ProductoRoutes {
         this._router.post('/actualizaTienda/:nombre', this.actualizaTienda)
         this._router.get('/borrarProducto/:nombre', this.deleteProducto)
         this._router.get('/borrarTienda/:nombre', this.deleteTienda)
+        this._router.get('/produ', this.getProdu)
         
     }
 }

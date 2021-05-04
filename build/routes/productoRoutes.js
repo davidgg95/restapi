@@ -204,7 +204,7 @@ class ProductoRoutes {
                 const query = yield schemas_1.Productos.aggregate([
                     {
                         $group: {
-                            _id: "$_tienda", Total_productos: { $sum: "$_cantidad" }
+                            _id: "_tienda", Total_productos: { $sum: "_cantidad" }
                         }
                     }
                 ]);
@@ -231,7 +231,7 @@ class ProductoRoutes {
         this._router.post('/actualizaTienda/:nombre', this.actualizaTienda);
         this._router.get('/borrarProducto/:nombre', this.deleteProducto);
         this._router.get('/borrarTienda/:nombre', this.deleteTienda);
-        this._router.get('/produ', this.getProdu);
+        this._router.get('/aggreProdu', this.getProdu);
     }
 }
 const obj = new ProductoRoutes();

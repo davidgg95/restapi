@@ -29,20 +29,6 @@ class ProductoRoutes {
             });
             yield database_1.db.desconectarBD();
         });
-        this.getTienda = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            yield database_1.db.conectarBD()
-                .then((mensaje) => __awaiter(this, void 0, void 0, function* () {
-                console.log(mensaje);
-                const query = yield schemas_1.Tiendas.find({});
-                console.log(query);
-                res.json(query);
-            }))
-                .catch((mensaje) => {
-                res.send(mensaje);
-                console.log(mensaje);
-            });
-            yield database_1.db.desconectarBD();
-        });
         this.getTiendas = (req, res) => __awaiter(this, void 0, void 0, function* () {
             yield database_1.db.conectarBD()
                 .then(() => __awaiter(this, void 0, void 0, function* () {
@@ -53,6 +39,31 @@ class ProductoRoutes {
                             localField: '_nombre',
                             foreignField: '_tienda',
                             as: "productos"
+                        }
+                    }
+                ]);
+                res.json(query);
+            }))
+                .catch((mensaje) => {
+                res.send(mensaje);
+            });
+            yield database_1.db.desconectarBD();
+        });
+        this.getTienda = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { nombre } = req.params;
+            yield database_1.db.conectarBD()
+                .then(() => __awaiter(this, void 0, void 0, function* () {
+                const query = yield schemas_1.Tiendas.aggregate([
+                    {
+                        $lookup: {
+                            from: 'productos',
+                            localField: '_nombre',
+                            foreignField: '_tienda',
+                            as: "productos"
+                        }
+                    }, {
+                        $match: {
+                            _nombre: nombre
                         }
                     }
                 ]);
@@ -223,8 +234,8 @@ class ProductoRoutes {
     misRutas() {
         this._router.get('/', this.getTiendas);
         this._router.get('/producto', this.getProductos);
-        this._router.get('/tienda', this.getTienda);
-        this._router.get('/:nombre', this.getProducto);
+        this._router.get('/tienda/:nombre', this.getTienda);
+        this._router.get('/producto/:nombre', this.getProducto);
         this._router.post('/nuevoProducto', this.nuevoProductoPost);
         this._router.post('/nuevoTienda', this.nuevoTiendaPost);
         this._router.post('/actualizaProducto/:nombre', this.actualizaProducto);

@@ -28,22 +28,6 @@ class ProductoRoutes {
         await db.desconectarBD()
     }
 
-    private getTienda = async (req: Request, res: Response) => {
-        await db.conectarBD()
-        .then( async (mensaje) => {
-            console.log(mensaje)
-            const query:any  = await Tiendas.find({})
-            console.log(query)
-            res.json(query)
-        })
-        .catch((mensaje) => {
-            res.send(mensaje)
-            console.log(mensaje)
-        })
-
-        await db.desconectarBD()
-    }
-
     private getTiendas = async (req:Request, res: Response) => {
         await db.conectarBD()
         .then( async ()=> {
@@ -54,6 +38,32 @@ class ProductoRoutes {
                         localField: '_nombre',
                         foreignField: '_tienda',
                         as: "productos"
+                    }
+                }
+            ])
+            res.json(query)
+        })
+        .catch((mensaje) => {
+            res.send(mensaje)
+        })
+        await db.desconectarBD()
+    }
+
+    private getTienda = async (req: Request, res: Response) => {
+        const { nombre } = req.params
+        await db.conectarBD()
+        .then( async ()=> {
+            const query = await Tiendas.aggregate([
+                {
+                    $lookup: {
+                        from: 'productos',
+                        localField: '_nombre',
+                        foreignField: '_tienda',
+                        as: "productos"
+                    }
+                },{
+                    $match: {
+                        _nombre: nombre
                     }
                 }
             ])
@@ -249,8 +259,8 @@ class ProductoRoutes {
     misRutas(){
         this._router.get('/', this.getTiendas)
         this._router.get('/producto', this.getProductos)
-        this._router.get('/tienda', this.getTienda)
-        this._router.get('/:nombre', this.getProducto)
+        this._router.get('/tienda/:nombre', this.getTienda)
+        this._router.get('/producto/:nombre', this.getProducto)
         this._router.post('/nuevoProducto', this.nuevoProductoPost)
         this._router.post('/nuevoTienda', this.nuevoTiendaPost)
         this._router.post('/actualizaProducto/:nombre', this.actualizaProducto)
